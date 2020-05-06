@@ -8,18 +8,18 @@
 	<parent>
 		<groupId>org.scijava</groupId>
 		<artifactId>pom-scijava</artifactId>
-		<version>24.2.0</version>
+		<version>26.0.0</version>
 		<relativePath />
 	</parent>
 
 	<groupId>pt.unl.itqb</groupId>
 	<artifactId>eHookeJ</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+	<version>0.0.1</version>
 
 	<name>eHookeJ</name>
 	<description>ImageJ plugin for bacteria microscopy image analysis</description>
 	<url>http://www.itqb.unl.pt/labs/bacterial-cell-biology</url>
-	<inceptionYear>2019</inceptionYear>
+	<inceptionYear>2020</inceptionYear>
 	<organization>
 		<name>ITQB</name>
 		<url>http://www.itqb.unl.pt/</url>
@@ -77,16 +77,16 @@
 
 	<properties>
 		<package-name>pt.unl.itqb</package-name>
-		<main-class>pt.unl.itqb.imagej.CellCountingWorkflow</main-class>
+		<main-class>eHookeJ</main-class>
 		<license.licenseName>bsd_3</license.licenseName>
 		<license.copyrightOwners>Bruno Saraiva</license.copyrightOwners>
-		<imagej.app.directory>C:\Fiji.app</imagej.app.directory>
+		<imagej.app.directory>C:\Users\bruno\Desktop\Fiji.app</imagej.app.directory>
 	</properties>
 
 	<repositories>
 		<repository>
-			<id>imagej.public</id>
-			<url>http://maven.imagej.net/content/groups/public</url>
+			<id>scijava.public</id>
+			<url>https://maven.scijava.org/content/groups/public</url>
 		</repository>
 	</repositories>
 
@@ -94,10 +94,6 @@
 		<dependency>
 			<groupId>net.imagej</groupId>
 			<artifactId>imagej</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>net.imagej</groupId>
-			<artifactId>imagej-legacy</artifactId>
 		</dependency>
 	</dependencies>
 </project>
