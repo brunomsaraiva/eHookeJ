@@ -20,6 +20,7 @@ import ij.WindowManager;
 import javax.swing.*;
 
 public class MaskManagerGUI {
+    MaskManager maskmanager;
     TextField borderInput;
     Checkbox invertInput;
     Choice maskalgchoice;
@@ -32,7 +33,7 @@ public class MaskManagerGUI {
     TextField xalignInput;
     TextField yalignInput;
 
-    public MaskManagerGUI(Parameters params) {
+    public MaskManagerGUI(MaskManager maskmanager, Parameters params) {
         MaskParameters maskparams = params.getMaskparameters();
         Frame frame = new Frame("eHookeJ - Mask Computation");
         ArrayList<Container> frames  = new ArrayList<>();
@@ -208,26 +209,6 @@ public class MaskManagerGUI {
         maskalgchoice.select(maskparams.getMaskalgorithm());
         maskalgFrame.add(maskalgchoice);
 
-        Container blocksizeFrame = new Container();
-        frames.add(blocksizeFrame);
-        GridLayout blocksizeGD = new GridLayout(1, 2);
-        blocksizeGD.setHgap(2);
-        blocksizeFrame.setLayout(blocksizeGD);
-        Label blocksizelabel = new Label("Blocksize:");
-        blocksizeFrame.add(blocksizelabel);
-        blocksizeInput = new TextField(Integer.toString(maskparams.getBlocksize()));
-        blocksizeFrame.add(blocksizeInput);
-
-        Container maskoffsetFrame = new Container();
-        frames.add(maskoffsetFrame);
-        GridLayout maskoffsetGD = new GridLayout(1, 2);
-        maskoffsetGD.setHgap(2);
-        maskoffsetFrame.setLayout(maskoffsetGD);
-        Label maskoffsetlabel = new Label("Mask Offset:");
-        maskoffsetFrame.add(maskoffsetlabel);
-        maskoffsetInput = new TextField(Double.toString(maskparams.getMaskoffset()));
-        maskoffsetFrame.add(maskoffsetInput);
-
         Container fillholesFrame = new Container();
         frames.add(fillholesFrame);
         GridLayout fillholesGD = new GridLayout(1, 2);
@@ -314,56 +295,22 @@ public class MaskManagerGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 updateParams(maskparams);
-                MaskManager.createMask((ImagePlus) WindowManager.getImage(baseimgSelector.getItem(baseimgSelector.getSelectedIndex())),
-                                       (ImagePlus) WindowManager.getImage(fluorimgSelector.getItem(fluorimgSelector.getSelectedIndex())),
-                                        params);
+                maskmanager.createMask((ImagePlus) WindowManager.getImage(baseimgSelector.getItem(baseimgSelector.getSelectedIndex())),
+                                       (ImagePlus) WindowManager.getImage(fluorimgSelector.getItem(fluorimgSelector.getSelectedIndex())));
             }
         });
         computeFrame.setLayout(compGD);
         computeFrame.add(computeMaskButton);
-
-        maskalgchoice.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (maskalgchoice.getItem(maskalgchoice.getSelectedIndex()).equals("Local Average")) {
-                    frame.removeAll();
-                    int ypos = 50;
-                    for (Container frm: frames) {
-                        frm.setBounds(10, ypos, 240, 30);
-                        frame.add(frm);
-                        frm.setVisible(true);
-                        ypos += 35;
-                    }
-                    frame.setVisible(true);
-                } else {
-                    frame.removeAll();
-                    int ypos = 50;
-                    for (Container frm: frames) {
-                        if (frm != blocksizeFrame && frm != maskoffsetFrame) {
-                            frm.setBounds(10, ypos, 240, 30);
-                            frame.add(frm);
-                            frm.setVisible(true);
-                            ypos += 35;
-                        }
-                    }
-                    frame.setVisible(true);
-                }
-            }
-        });
-
-
 
         frame.setSize(260,600);
         frame.setLayout(null);
 
         int ypos = 50;
         for (Container frm: frames) {
-            if (frm != blocksizeFrame && frm != maskoffsetFrame) {
-                frm.setBounds(10, ypos, 240, 30);
-                frame.add(frm);
-                frm.setVisible(true);
-                ypos += 35;
-            }
+            frm.setBounds(10, ypos, 240, 30);
+            frame.add(frm);
+            frm.setVisible(true);
+            ypos += 35;
         }
         frame.setVisible(true);
     }
@@ -372,8 +319,6 @@ public class MaskManagerGUI {
         maskParameters.setBorder(Integer.parseInt(borderInput.getText()));
         maskParameters.setIsfluorescence(invertInput.getState());
         maskParameters.setMaskalgorithm(maskalgchoice.getItem(maskalgchoice.getSelectedIndex()));
-        maskParameters.setBlocksize(Integer.parseInt(blocksizeInput.getText()));
-        maskParameters.setMaskoffset(Double.parseDouble(maskoffsetInput.getText()));
         maskParameters.setFillholes(fillholesInput.getState());
         maskParameters.setMaskclosing(Integer.parseInt(maskclosingInput.getText()));
         maskParameters.setMaskdilation(Integer.parseInt(maskdilationInput.getText()));

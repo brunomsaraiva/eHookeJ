@@ -8,17 +8,23 @@ import ij.gui.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import net.imagej.ImageJ;
 import net.imglib2.roi.Mask;
 import pt.unl.itqb.imagej.masks.MaskManager;
+import pt.unl.itqb.imagej.masks.MaskManagerGUI;
+import pt.unl.itqb.imagej.parameters.MaskParameters;
 import pt.unl.itqb.imagej.parameters.Parameters;
 
 public class Gui {
 
     private Frame frame;
     private Button maskButton;
+    private Parameters params;
 
     public static void run() {
-        Parameters parameters = new Parameters();
+        Parameters params = new Parameters();
+        MaskManager maskmanager = new MaskManager(params);
+        MaskParameters maskParameters = params.getMaskparameters();
         Frame frame = new Frame("eHookeJ");
         frame.addWindowListener(new WindowListener() {
             @Override
@@ -57,42 +63,40 @@ public class Gui {
             }
         });
 
-        Label titleLabel = new Label("eHookeJ");
-        titleLabel.setBounds(20, 50, 150, 30);
+        Label titleLabel = new Label("eHookeJ", Label.CENTER);
 
         Button computeMaskButton = new Button("Compute Mask");
-        computeMaskButton.setBounds(20,90, 150, 30);
         computeMaskButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MaskManager.run();
+                MaskManagerGUI maskManagerGUI = new MaskManagerGUI(maskmanager, params);
             }
         });
 
         Button computeSegmentsButton = new Button("Compute Segments");
-        computeSegmentsButton.setBounds(20,130, 150, 30);
         computeSegmentsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MaskManager.run();
+
             }
         });
 
         Button computeCellsButton = new Button("Compute Cells");
-        computeCellsButton.setBounds(20,170, 150, 30);
         computeCellsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                MaskManager.run();
+
             }
         });
 
+        frame.setSize(250,250);
+        GridLayout gd = new GridLayout(5, 1);
+        gd.setVgap(5);
+        frame.setLayout(gd);
         frame.add(titleLabel);
         frame.add(computeMaskButton);
         frame.add(computeSegmentsButton);
         frame.add(computeCellsButton);
-        frame.setSize(190,250);
-        frame.setLayout(null);
         frame.setVisible(true);
     }
 
