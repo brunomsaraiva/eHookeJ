@@ -2,13 +2,10 @@ package pt.unl.itqb.imagej.masks;
 
 import ij.IJ;
 import ij.ImagePlus;
-import ij.plugin.filter.Binary;
+import ij.process.Blitter;
+import ij.process.ImageConverter;
 import ij.process.ImageProcessor;
 import net.imagej.ImageJ;
-import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.img.basictypeaccess.array.ByteArray;
-import net.imglib2.img.display.imagej.ImageJFunctions;
-import net.imglib2.img.ImagePlusAdapter;
 import pt.unl.itqb.imagej.parameters.MaskParameters;
 import pt.unl.itqb.imagej.parameters.Parameters;
 
@@ -17,18 +14,24 @@ public class MaskManager {
     private ImagePlus fluorimg_aligned;
     private ImagePlus mask;
     private Parameters parameters;
+    private ImagePlus baseoverlay;
+    private ImagePlus fluoroverlay;
 
     public MaskManager(Parameters params) {
         this.baseimg_aligned = new ImagePlus();
         this.fluorimg_aligned = new ImagePlus();
         this.mask = new ImagePlus();
         this.parameters = params;
+        this.baseoverlay = new ImagePlus();
+        this.fluoroverlay = new ImagePlus();
     }
 
     public void createMask(ImagePlus baseimg, ImagePlus fluorimg) {
         ImageJ ij = new ImageJ();
         this.baseimg_aligned = baseimg;
         this.fluorimg_aligned = fluorimg;
+        this.baseoverlay = new ImagePlus();
+        this.fluoroverlay = new ImagePlus();
         MaskParameters maskparams = this.parameters.getMaskparameters();
         int xborder = maskparams.getBorder();
         int yborder = maskparams.getBorder();
@@ -44,14 +47,15 @@ public class MaskManager {
         }
 
         if (maskparams.getBorder() > 0) {
-            ImagePlus cropped_baseimg_aligned = clipBorder(baseimg_aligned, maskparams.getBorder(), maskparams.getBorder());
+            ImagePlus cropped_baseimg_aligned = clipBorder(baseimg_aligned, 0, 0, maskparams.getBorder());
             cropped_baseimg_aligned.setTitle("Cropped_"+baseimg_aligned.getTitle());
             baseimg_aligned = cropped_baseimg_aligned;
         }
 
-        mask = thresholdMethod(baseimg_aligned, maskparams);
-        IJ.run(mask, "Make Binary", "");
+        this.mask = (ImagePlus) baseimg_aligned.duplicate();
+        mask = thresholdMethod(mask, maskparams);
         mask.show();
+        IJ.run(mask, "Make Binary", "");
 
         if (maskparams.getFillHoles()) {
             IJ.run(mask, "Fill Holes", "");
@@ -72,16 +76,26 @@ public class MaskManager {
         mask.changes = false;
 
         if (maskparams.getAutoalign()) {
-            fluorimg_aligned = autoAlign(fluorimg_aligned, mask);
+            autoAlign(fluorimg_aligned, mask, maskparams.getBorder());
         } else {
             fluorimg_aligned = clipBorder(fluorimg_aligned,
-                                  xborder+maskparams.getXalign(),
-                                  yborder+maskparams.getYalign());
+                                          maskparams.getXalign(),
+                                          maskparams.getYalign(),
+                                          maskparams.getBorder());
         }
+
+        olMask(baseimg_aligned, mask);
+        olMask(fluorimg_aligned, mask);
     }
 
-    public static ImagePlus clipBorder(ImagePlus img, int xborder, int yborder) {
-        img.setRoi(xborder, yborder, img.getWidth()-2*xborder, img.getHeight()-2*yborder);
+    public static ImagePlus clipBorder(ImagePlus img, int x, int y, int border) {
+        if (x > border) {
+            x = border;
+        }
+        if (y > border) {
+            y = border;
+        }
+        img.setRoi(border+x, border+y, img.getWidth()-2*border, img.getHeight()-2*border);
         return img.crop();
     }
 
@@ -95,11 +109,50 @@ public class MaskManager {
         return new ImagePlus("Mask", ip.convertToByteProcessor());
     }
 
-    public static ImagePlus autoAlign(ImagePlus img, ImagePlus mask) {
-        return img;
+    public static ImagePlus autoAlign(ImagePlus img, ImagePlus mask, int border) {
+        int xalign = 0;
+        int yalign = 0;
+        int minscore = 0;
+        int maxalign = border;
+        ImagePlus binmask = (ImagePlus) mask.duplicate();
+        ImageProcessor binmaskip = binmask.getProcessor();
+        binmaskip.multiply(0.003921568627451);
+
+        for (int i=-maxalign; i<=maxalign; i++) {
+            for (int ii=-maxalign; ii<=maxalign; ii++) {
+                ImagePlus tmp = (ImagePlus) clipBorder(img, i, ii, maxalign);
+                ImageProcessor tmpip = tmp.getProcessor();
+                tmpip.copyBits(binmaskip, 0, 0, Blitter.MULTIPLY);
+                int calc = 0;
+                for (int w=0; w<tmp.getWidth(); w++) {
+                    for (int h=0; h<tmp.getHeight(); h++) {
+                        calc += tmpip.get(w, h);
+                    }
+                }
+
+                if (calc> minscore) {
+                    minscore = calc;
+                    xalign = i;
+                    yalign = ii;
+                }
+            }
+        }
+        System.out.println(xalign + "-" + yalign);
+        return clipBorder(img, xalign, yalign, maxalign);
     }
 
-    public static ImagePlus overlayMask(ImagePlus img, ByteArray mask) {
-        return img;
+    public static void olMask(ImagePlus img, ImagePlus mask) {
+        ImagePlus edges = (ImagePlus) mask.duplicate();
+        ImagePlus tmp = (ImagePlus) img.duplicate();
+        ImageConverter convertedtmp = new ImageConverter(tmp);
+        convertedtmp.convertToGray8();
+        tmp.setTitle("8bit base");
+        tmp.show();
+        IJ.run(edges, "Find Edges", "");
+        edges.setTitle("Edges");
+        edges.show();
+        IJ.run(tmp,"Merge Channels...", "c4=["+tmp.getTitle()+"] c5=["+edges.getTitle()+"] create");
+        tmp.close();
+        edges.close();
     }
 }
