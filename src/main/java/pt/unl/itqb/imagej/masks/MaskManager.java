@@ -1,6 +1,8 @@
 package pt.unl.itqb.imagej.masks;
 
+import ij.IJ;
 import ij.ImagePlus;
+import ij.plugin.filter.Binary;
 import ij.process.ImageProcessor;
 import net.imagej.ImageJ;
 import net.imglib2.RandomAccessibleInterval;
@@ -48,12 +50,26 @@ public class MaskManager {
         }
 
         mask = thresholdMethod(baseimg_aligned, maskparams);
+        IJ.run(mask, "Make Binary", "");
         mask.show();
 
         if (maskparams.getFillHoles()) {
-            // not working, missing fill holes, closing, dilation and autoalign
-            mask = (ImagePlus) ij.op().morphology().fillHoles((RandomAccessibleInterval) ImageJFunctions.wrapReal(mask));
+            IJ.run(mask, "Fill Holes", "");
         }
+
+        if (maskparams.getMaskclosing() > 0) {
+            for (int i = 0; i<maskparams.getMaskclosing(); i++) {
+                IJ.run(mask, "Close-", "");
+            }
+        }
+
+        if (maskparams.getMaskdilation() > 0) {
+            for (int i=0; i<maskparams.getMaskdilation(); i++) {
+                IJ.run(mask, "Dilate", "");
+            }
+        }
+
+        mask.changes = false;
 
         if (maskparams.getAutoalign()) {
             fluorimg_aligned = autoAlign(fluorimg_aligned, mask);
@@ -76,11 +92,7 @@ public class MaskManager {
         if (!maskparams.getIsFluorescence()) {
             ip.invert();
         }
-        return new ImagePlus("Mask", ip);
-    }
-
-    public static ByteArray fillHoles(ByteArray mask) {
-        return mask;
+        return new ImagePlus("Mask", ip.convertToByteProcessor());
     }
 
     public static ImagePlus autoAlign(ImagePlus img, ImagePlus mask) {
