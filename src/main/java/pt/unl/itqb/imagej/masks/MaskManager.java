@@ -74,16 +74,24 @@ public class MaskManager {
         }
 
         mask.changes = false;
+        System.out.println(this.fluorimg_aligned.getTitle());
 
         if (maskparams.getAutoalign()) {
-            autoAlign(fluorimg_aligned, mask, maskparams.getBorder());
+            ImagePlus cropped_fluorimage = autoAlign(fluorimg_aligned, mask, maskparams.getBorder());
+            cropped_fluorimage.setTitle("Cropped_" + fluorimg_aligned.getTitle());
+            fluorimg_aligned = cropped_fluorimage;
         } else {
-            fluorimg_aligned = clipBorder(fluorimg_aligned,
-                                          maskparams.getXalign(),
-                                          maskparams.getYalign(),
-                                          maskparams.getBorder());
+            ImagePlus cropped_fluorimage = clipBorder(fluorimg_aligned,
+                                           maskparams.getXalign(),
+                                           maskparams.getYalign(),
+                                           maskparams.getBorder());
+            cropped_fluorimage.setTitle("Cropped_" + fluorimg_aligned.getTitle());
+            fluorimg_aligned = cropped_fluorimage;
         }
+        System.out.println(this.fluorimg_aligned.getTitle());
 
+        baseimg_aligned.show();
+        fluorimg_aligned.show();
         olMask(baseimg_aligned, mask);
         olMask(fluorimg_aligned, mask);
     }
@@ -146,7 +154,7 @@ public class MaskManager {
         ImagePlus tmp = (ImagePlus) img.duplicate();
         ImageConverter convertedtmp = new ImageConverter(tmp);
         convertedtmp.convertToGray8();
-        tmp.setTitle("8bit base");
+        tmp.setTitle("8bit " + img.getTitle());
         tmp.show();
         IJ.run(edges, "Find Edges", "");
         edges.setTitle("Edges");
