@@ -74,7 +74,6 @@ public class MaskManager {
         }
 
         mask.changes = false;
-        System.out.println(this.fluorimg_aligned.getTitle());
 
         if (maskparams.getAutoalign()) {
             ImagePlus cropped_fluorimage = autoAlign(fluorimg_aligned, mask, maskparams.getBorder());
@@ -88,7 +87,6 @@ public class MaskManager {
             cropped_fluorimage.setTitle("Cropped_" + fluorimg_aligned.getTitle());
             fluorimg_aligned = cropped_fluorimage;
         }
-        System.out.println(this.fluorimg_aligned.getTitle());
 
         baseimg_aligned.show();
         fluorimg_aligned.show();
@@ -145,7 +143,6 @@ public class MaskManager {
                 }
             }
         }
-        System.out.println(xalign + "-" + yalign);
         return clipBorder(img, xalign, yalign, maxalign);
     }
 

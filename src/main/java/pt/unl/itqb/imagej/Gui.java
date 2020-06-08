@@ -14,6 +14,9 @@ import pt.unl.itqb.imagej.masks.MaskManager;
 import pt.unl.itqb.imagej.masks.MaskManagerGUI;
 import pt.unl.itqb.imagej.parameters.MaskParameters;
 import pt.unl.itqb.imagej.parameters.Parameters;
+import pt.unl.itqb.imagej.parameters.SegmentationParameters;
+import pt.unl.itqb.imagej.segments.SegmentManager;
+import pt.unl.itqb.imagej.segments.SegmentManagerGUI;
 
 public class Gui {
 
@@ -25,6 +28,8 @@ public class Gui {
         Parameters params = new Parameters();
         MaskManager maskmanager = new MaskManager(params);
         MaskParameters maskParameters = params.getMaskparameters();
+        SegmentManager segmentmanager = new SegmentManager(params);
+        SegmentationParameters segmentationParameters = params.getSegmentationparameters();
         Frame frame = new Frame("eHookeJ");
         frame.addWindowListener(new WindowListener() {
             @Override
@@ -77,6 +82,7 @@ public class Gui {
         computeSegmentsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                SegmentManagerGUI segmentManagerGUI = new SegmentManagerGUI(segmentmanager, params);
 
             }
         });

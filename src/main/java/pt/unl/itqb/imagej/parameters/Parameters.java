@@ -14,4 +14,8 @@ public class Parameters {
     public MaskParameters getMaskparameters() {
         return this.maskparameters;
     }
+
+    public SegmentationParameters getSegmentationparameters() {
+        return this.segmentationparameters;
+    }
 }
