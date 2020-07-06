@@ -48,7 +48,7 @@ public class MaskManager {
 
         if (maskparams.getBorder() > 0) {
             ImagePlus cropped_baseimg_aligned = clipBorder(baseimg_aligned, 0, 0, maskparams.getBorder());
-            cropped_baseimg_aligned.setTitle("Cropped_"+baseimg_aligned.getTitle());
+            cropped_baseimg_aligned.setTitle("Aligned_"+baseimg_aligned.getTitle());
             baseimg_aligned = cropped_baseimg_aligned;
         }
 
@@ -77,14 +77,14 @@ public class MaskManager {
 
         if (maskparams.getAutoalign()) {
             ImagePlus cropped_fluorimage = autoAlign(fluorimg_aligned, mask, maskparams.getBorder());
-            cropped_fluorimage.setTitle("Cropped_" + fluorimg_aligned.getTitle());
+            cropped_fluorimage.setTitle("Aligned_" + fluorimg_aligned.getTitle());
             fluorimg_aligned = cropped_fluorimage;
         } else {
             ImagePlus cropped_fluorimage = clipBorder(fluorimg_aligned,
                                            maskparams.getXalign(),
                                            maskparams.getYalign(),
                                            maskparams.getBorder());
-            cropped_fluorimage.setTitle("Cropped_" + fluorimg_aligned.getTitle());
+            cropped_fluorimage.setTitle("Aligned_" + fluorimg_aligned.getTitle());
             fluorimg_aligned = cropped_fluorimage;
         }
 

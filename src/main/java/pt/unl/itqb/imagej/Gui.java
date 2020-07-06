@@ -27,9 +27,7 @@ public class Gui {
     public static void run() {
         Parameters params = new Parameters();
         MaskManager maskmanager = new MaskManager(params);
-        MaskParameters maskParameters = params.getMaskparameters();
         SegmentManager segmentmanager = new SegmentManager(params);
-        SegmentationParameters segmentationParameters = params.getSegmentationparameters();
         Frame frame = new Frame("eHookeJ");
         frame.addWindowListener(new WindowListener() {
             @Override

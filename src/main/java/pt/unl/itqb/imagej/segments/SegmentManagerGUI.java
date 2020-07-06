@@ -170,7 +170,7 @@ public class SegmentManagerGUI {
         });
         
         Container mindistFrame = new Container();
-        frames.add(mindistFrame);
+        //frames.add(mindistFrame);
         GridLayout mindistGD = new GridLayout(1, 2);
         mindistGD.setHgap(2);
         mindistFrame.setLayout(mindistGD);
@@ -186,11 +186,11 @@ public class SegmentManagerGUI {
         minheightFrame.setLayout(minheightGD);
         Label minheightLabel = new Label("Peak Min Height:");
         minheightFrame.add(minheightLabel);
-        minheightInput = new TextField(Integer.toString(segmentationParameters.getPeakminheight()));
+        minheightInput = new TextField(Double.toString(segmentationParameters.getPeakminheight()));
         minheightFrame.add(minheightInput);
 
         Container minedgeFrame = new Container();
-        frames.add(minedgeFrame);
+        //frames.add(minedgeFrame);
         GridLayout minedgeGD = new GridLayout(1, 2);
         minedgeGD.setHgap(2);
         minedgeFrame.setLayout(minedgeGD);
@@ -200,7 +200,7 @@ public class SegmentManagerGUI {
         minedgeFrame.add(minedgeInput);
 
         Container maxpeaksFrame = new Container();
-        frames.add(maxpeaksFrame);
+        //frames.add(maxpeaksFrame);
         GridLayout maxpeaksGD = new GridLayout(1, 2);
         maxpeaksGD.setHgap(2);
         maxpeaksFrame.setLayout(maxpeaksGD);
@@ -217,7 +217,7 @@ public class SegmentManagerGUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 updateParams(segmentationParameters);
-                segmentManager.createMask((ImagePlus) WindowManager.getImage(baseimgSelector.getItem(baseimgSelector.getSelectedIndex())),
+                segmentManager.createSegments((ImagePlus) WindowManager.getImage(baseimgSelector.getItem(baseimgSelector.getSelectedIndex())),
                         (ImagePlus) WindowManager.getImage(maskSelector.getItem(maskSelector.getSelectedIndex())));
             }
         });
@@ -239,7 +239,7 @@ public class SegmentManagerGUI {
 
     public void updateParams(SegmentationParameters segmentationParameters) {
         segmentationParameters.setPeakmindist(Integer.parseInt(mindistInput.getText()));
-        segmentationParameters.setPeakminheight(Integer.parseInt(minheightInput.getText()));
+        segmentationParameters.setPeakminheight(Double.parseDouble(minheightInput.getText()));
         segmentationParameters.setPeakminedge(Integer.parseInt(minedgeInput.getText()));
         segmentationParameters.setMaxpeaks(Integer.parseInt(maxpeaksInput.getText()));
     }
