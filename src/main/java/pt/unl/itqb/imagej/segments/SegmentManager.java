@@ -1,9 +1,10 @@
 package pt.unl.itqb.imagej.segments;
 
+import ij.IJ;
 import ij.ImagePlus;
+import ij.plugin.frame.RoiManager;
 import ijopencv.ij.ImagePlusMatConverter;
 import ijopencv.opencv.MatImagePlusConverter;
-import net.imagej.ImageJ;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_imgproc;
 import org.bytedeco.javacpp.opencv_core.Point;
@@ -33,7 +34,7 @@ public class SegmentManager {
     }
 
     public void createSegments(ImagePlus baseimg, ImagePlus mask) {
-        SegmentationParameters segmentparams = this.parameters.getSegmentationparameters();
+        /**SegmentationParameters segmentparams = this.parameters.getSegmentationparameters();
         ImageJ ij = new ImageJ();
         Mat mat_baseimg = ImagePlusMatConverter.toMat(baseimg.getProcessor());
         Mat mat_mask = ImagePlusMatConverter.toMat(mask.getProcessor());
@@ -69,6 +70,14 @@ public class SegmentManager {
         opencv_imgproc.watershed(imgResult, markers);
 
         ImagePlus watershed = new ImagePlus("Watershed", MatImagePlusConverter.toImageProcessor(imgResult));
-        watershed.show();
+        watershed.show();**/
+
+        //change to seeded watershed
+
+        IJ.run(mask,"Watershed", "");
+        RoiManager roimng = RoiManager.getRoiManager();
+        roimng.runCommand(mask,"Delete");
+        IJ.run(mask, "Analyze Particles...", "add display clear summarize");
+
     }
 }

@@ -92,6 +92,8 @@ public class MaskManager {
         fluorimg_aligned.show();
         olMask(baseimg_aligned, mask);
         olMask(fluorimg_aligned, mask);
+
+        IJ.run("Tile");
     }
 
     public static ImagePlus clipBorder(ImagePlus img, int x, int y, int border) {
